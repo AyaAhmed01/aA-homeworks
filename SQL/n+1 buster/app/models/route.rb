@@ -20,6 +20,16 @@ class Route < ApplicationRecord
   end
 
   def better_drivers_query
-    # TODO: your code here
+    buses = self.buses.includes(:drivers)
+    all_drivers = {}
+    buses.each do |bus|
+      names = []
+      # will not fire a query for each route since drivers have already been prefetched
+      bus.drivers.each do |driver|
+        names << driver.name
+      end
+      all_drivers[bus.id] = names
+    end
+    all_drivers
   end
 end
