@@ -18,7 +18,7 @@ class Artist < ApplicationRecord
     albums = self.albums
               .select('albums.title, COUNT(*) AS num_of_tracks')
               .joins(:tracks)
-              .group('album_id')
+              .group('albums.id')
               
 
     tracks_count = {}
