@@ -108,21 +108,33 @@ class MetaCorgiSnacks
   def initialize(snack_box, box_id)
     @snack_box = snack_box
     @box_id = box_id
+    # get all snack_box methods, get the snack in all methods with variation 'get_{snack}_info'
+    # then call ::define_snack on each of them
+    @snack_box.methods.grep(/^get_(.*)_info$/){MetaCorgiSnacks.define_snack $1}
   end
 
-  def method_missing(name, *args)
-    name = name.to_s
-    info_method_name = "get_#{name}_info"
-    tastiness_method_name = "get_#{name}_tastiness"
+  # refactor using method_missing:
+  # def method_missing(name, *args)
+  #   name = name.to_s
+  #   info_method_name = "get_#{name}_info"
+  #   tastiness_method_name = "get_#{name}_tastiness"
 
-    info = @snack_box.send(info_method_name, *args)
-    tastiness = @snack_box.send(tastiness_method_name, *args)
-    result = "#{name.capitalize}: #{info}: #{tastiness} "
-    tastiness > 30 ? "* #{result}" : result
-  end
+  #   info = @snack_box.send(info_method_name, *args)
+  #   tastiness = @snack_box.send(tastiness_method_name, *args)
+  #   result = "#{name.capitalize}: #{info}: #{tastiness} "
+  #   tastiness > 30 ? "* #{result}" : result
+  # end
 
-
+  # refactor using define_snack:
   def self.define_snack(name)
-    # Your code goes here...
+    define_method(name) do
+      info_method_name = "get_#{name}_info"
+      tastiness_method_name = "get_#{name}_tastiness"
+
+      info = @snack_box.send(info_method_name, @box_id)
+      tastiness = @snack_box.send(tastiness_method_name, @box_id)
+      result = "#{name.capitalize}: #{info}: #{tastiness} "
+      tastiness > 30 ? "* #{result}" : result
+    end
   end
 end
